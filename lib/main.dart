@@ -1,5 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
@@ -18,32 +20,28 @@ class MyApp extends StatelessWidget {
 class FormularioTransferencia extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
+    final TextEditingController _controladorNumeroConta =
+        TextEditingController();
+    final TextEditingController _controladorValor = TextEditingController();
+
     return Scaffold(
         appBar: AppBar(title: Text("Registro de Transferência")),
         body: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: TextField(
-                style: TextStyle(fontSize: 24),
-                decoration: InputDecoration(
-                    labelText: "Número da Conta", hintText: "0000"),
-                keyboardType: TextInputType.number,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: TextField(
-                style: TextStyle(fontSize: 24),
-                decoration: InputDecoration(
-                    icon: Icon(Icons.monetization_on),
-                    labelText: "Valor",
-                    hintText: "0.00"),
-                keyboardType: TextInputType.number,
-              ),
-            ),
-            ElevatedButton(onPressed: () {}, child: Text("Confirmar")),
+            Editor(_controladorNumeroConta, "Número da Conta", "0000",
+                Icons.account_circle),
+            Editor(_controladorValor, "Valor", "0.00", Icons.monetization_on),
+            ElevatedButton(
+                onPressed: () {
+                  final int numeroConta =
+                      int.parse(_controladorNumeroConta.text);
+                  final double valor = double.parse(_controladorValor.text);
+                  if (numeroConta != null || valor != null) {
+                    final transferenciaCriada =
+                        Transferencia(numeroConta: numeroConta, valor: valor);
+                  }
+                },
+                child: Text("Confirmar")),
           ],
         ));
   }
@@ -93,4 +91,35 @@ class Transferencia {
     required this.valor,
     required this.numeroConta,
   });
+
+  @override
+  String toString() =>
+      'Transferencia(valor: $valor, numeroConta: $numeroConta)';
+}
+
+class Editor extends StatelessWidget {
+  final TextEditingController _controlador;
+  final String _text;
+  final String _dica;
+  final IconData _icone;
+
+  Editor(this._controlador, this._text, this._dica, this._icone);
+
+  // ignore: empty_constructor_bodies
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: TextField(
+        controller: _controlador,
+        style: TextStyle(fontSize: 24),
+        decoration: InputDecoration(
+          icon: Icon(_icone),
+          labelText: _text,
+          hintText: _dica,
+        ),
+        keyboardType: TextInputType.number,
+      ),
+    );
+  }
 }
